@@ -26,7 +26,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/feedback",
+        "https://exercise5-3dhi.onrender.com/feedback",
         {
           method: "POST",
           headers: {
