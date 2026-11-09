@@ -1,4 +1,5 @@
-
+require("node:dns").setServers(["1.1.1.1", "8.8.8.8"]);
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -17,15 +18,13 @@ app.use(cors({
 
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect("mongodb://127.0.0.1:27017/feedbackDB")
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log("MongoDB Connected");
+        console.log("MongoDB Atlas Connected Successfully!");
     })
     .catch((err) => {
         console.log("MongoDB Error:", err.message);
     });
-
 // Feedback model
 const Feedback = mongoose.model("Feedback", {
     name: String,
@@ -43,7 +42,11 @@ app.get("/", (req, res) => {
 // Submit feedback
 app.post("/feedback", async (req, res) => {
     try {
+        console.log("Received Feedback:", req.body);
+
         const savedFeedback = await Feedback.create(req.body);
+
+        console.log("Saved Feedback:", savedFeedback);
 
         res.status(201).json({
             message: "Feedback submitted successfully!",
@@ -51,7 +54,6 @@ app.post("/feedback", async (req, res) => {
         });
     } catch (error) {
         console.log("Error:", error.message);
-
         res.status(500).json({
             message: "Failed to save feedback"
         });
@@ -71,7 +73,8 @@ app.get("/feedback", async (req, res) => {
 });
 
 // Start server
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
-});
+const PORT = process.env.PORT || 5000;
 
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
